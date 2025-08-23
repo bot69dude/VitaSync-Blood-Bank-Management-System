@@ -22,7 +22,8 @@ public interface TransfusionRequestRepository extends JpaRepository<TransfusionR
     
     Page<TransfusionRequest> findByBloodType(BloodType bloodType, Pageable pageable);
     
-    List<TransfusionRequest> findByPatientId(Long patientId);
+    @Query("SELECT tr FROM TransfusionRequest tr WHERE tr.patient.id = :patientId")
+    List<TransfusionRequest> findByPatientId(@org.springframework.data.repository.query.Param("patientId") Long patientId);
     
     @Query("SELECT tr FROM TransfusionRequest tr WHERE tr.urgency IN ('HIGH', 'CRITICAL') AND tr.status = 'PENDING'")
     List<TransfusionRequest> findUrgentRequests();

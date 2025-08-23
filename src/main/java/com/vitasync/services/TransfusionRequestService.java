@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.vitasync.dto.TransfusionRequestDto;
 import com.vitasync.entity.TransfusionRequest;
@@ -33,7 +35,7 @@ public class TransfusionRequestService {
 
     public TransfusionRequestDto createRequest(TransfusionRequestDto dto, Long patientId) {
         User patient = userRepository.findById(patientId)
-            .orElseThrow(() -> new RuntimeException("Patient not found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found"));
 
         TransfusionRequest request = new TransfusionRequest();
         request.setPatient(patient);
@@ -94,7 +96,7 @@ public class TransfusionRequestService {
 
     public TransfusionRequestDto getRequestById(Long id) {
         TransfusionRequest request = requestRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Request not found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Request not found"));
         return convertToDto(request);
     }
 
@@ -106,7 +108,7 @@ public class TransfusionRequestService {
 
     public TransfusionRequestDto updateRequestStatus(Long id, RequestStatus status) {
         TransfusionRequest request = requestRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Request not found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Request not found"));
         
         request.setStatus(status);
         request.setUpdatedAt(LocalDateTime.now());

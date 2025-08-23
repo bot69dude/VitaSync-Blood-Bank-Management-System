@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vitasync.dto.AuthRequest;
 import com.vitasync.dto.AuthResponse;
+import com.vitasync.dto.UserResponse;
 import com.vitasync.dto.RegisterRequest;
 import com.vitasync.entity.User;
 import com.vitasync.enums.BloodType;
@@ -51,7 +52,7 @@ public class AuthController {
         // Check if user already exists
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new AuthResponse(null, null, null, "ERROR: Email already registered. Please use a different email or try logging in."));
+                .body(new AuthResponse(null, null, "ERROR: Email already registered. Please use a different email or try logging in."));
         }
         
         User newUser = new User();
@@ -84,7 +85,7 @@ public class AuthController {
         String token = jwtTokenUtil.generateToken(userDetails);
         
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(new AuthResponse(token, savedUser.getEmail(), savedUser.getRole().name()));
+            .body(new AuthResponse(token, new UserResponse(savedUser), "User registered and authenticated"));
     }
 
     @PostMapping("/login")
@@ -100,11 +101,11 @@ public class AuthController {
             User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
             
-            return ResponseEntity.ok(new AuthResponse(token, user.getEmail(), user.getRole().name()));
+            return ResponseEntity.ok(new AuthResponse(token, new UserResponse(user), "Login successful"));
             
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new AuthResponse(null, null, null, "ERROR: Invalid email or password. Please check your credentials."));
+                .body(new AuthResponse(null, null, "ERROR: Invalid email or password. Please check your credentials."));
         }
     }
 }
